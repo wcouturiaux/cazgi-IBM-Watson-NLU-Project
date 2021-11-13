@@ -15,28 +15,27 @@ variables that you set up in the .env file*/
 const dotenv = require('dotenv');
 dotenv.config();
 
-const api_key = process.env.API_KEY;
-const api_url = process.env.API_URL;
-
 function getNLUInstance() {
+  const api_key = process.env.API_KEY;
+  const api_url = process.env.API_URL;
+
   const NaturalLanguageUnderstandingV1 = require('ibm-watson/natural-language-understanding/v1');
-  const {
-    IamAuthenticator
-  } = require('ibm-watson/auth');
+  const { IamAuthenticator } = require('ibm-watson/auth');
   const naturalLanguageUnderstanding = new NaturalLanguageUnderstandingV1({
-    version: '2021-08-01';
+    version: '2021-08-01',
     authenticator: new IamAuthenticator({
-      apikey: api_key
+      apikey: api_key,
     }),
-    serviceUrl: api_url;
+    serviceUrl: api_url,
   });
   return naturalLanguageUnderstanding;
 
 }
-
+console.log("I am the server");
 
 //The default endpoint for the webserver
 app.get("/", (req, res) => {
+  console.log("inside base endpoint");
   res.render('index.html');
 });
 
@@ -54,7 +53,7 @@ app.get("/url/emotion", (req, res) => {
     }
   }
 
-  const NaturalLanguageUnderstanding = getNLUInstance();
+  let naturalLanguageUnderstanding = getNLUInstance();
 
   naturalLanguageUnderstanding.analyze(analyzeParams)
     .then(analysisResults => {
@@ -95,9 +94,9 @@ app.get("/url/sentiment", (req, res) => {
 
 //The endpoint for the webserver ending with /text/emotion
 app.get("/text/emotion", (req, res) => {
-  let urlToAnalyze = req.query.url;
+  let urlToAnalyze = req.query.text;
   const analyzeParams = {
-    "url": urlToAnalyze,
+    "text": urlToAnalyze,
     "features": {
       "keywords": {
         "emotion": true,
@@ -106,11 +105,11 @@ app.get("/text/emotion", (req, res) => {
     }
   }
 
-  const naturalLanguageUnderstanding = getNLUInstance();
+  let naturalLanguageUnderstanding = getNLUInstance();
 
   naturalLanguageUnderstanding.analyze(analyzeParams)
   .then(analysisResults => {
-    return res.send(analysisResults.result.keywords[0].sentiment, null, 2);
+    return res.send(analysisResults.result.keywords[0].emotion, null, 2);
   })
   .catch(err => {
     return res.send("Could not process " + err);
@@ -119,9 +118,9 @@ app.get("/text/emotion", (req, res) => {
 });
 
 app.get("/text/sentiment", (req, res) => {
-  let urlToAnalyze = req.query.url;
+  let urlToAnalyze = req.query.text;
   const analyzeParams = {
-    "url": urlToAnalyze,
+    "text": urlToAnalyze,
     "features": {
       "keywords": {
         "sentiment": true,
@@ -130,7 +129,7 @@ app.get("/text/sentiment", (req, res) => {
     }
   }
 
-  const naturalLanguageUnderstanding = getNLUInstance();
+  let naturalLanguageUnderstanding = getNLUInstance();
 
   naturalLanguageUnderstanding.analyze(analyzeParams)
     .then(analysisResults => {
