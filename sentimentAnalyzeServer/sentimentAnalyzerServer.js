@@ -31,11 +31,9 @@ function getNLUInstance() {
   return naturalLanguageUnderstanding;
 
 }
-console.log("I am the server");
 
 //The default endpoint for the webserver
 app.get("/", (req, res) => {
-  console.log("inside base endpoint");
   res.render('index.html');
 });
 
